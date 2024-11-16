@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f8ff;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .home-link {
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .home-link:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .actions a {
+            margin-right: 10px;
+            color: #007bff;
+        }
+
+        .actions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="home-link"><i class="fas fa-home"></i> Home</a>
+        <h1>Billing Management</h1>
+
+        <!-- Billing Table -->
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Billing ID</th>
+                    <th>Appointment ID</th>
+                    <th>Amount</th>
+                    <th>Payment Status</th>
+                    <th>Billing Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in billing %}
+                <tr>
+                    <td>{{ bill[0] }}</td>
+                    <td>{{ bill[1] }}</td>
+                    <td>{{ bill[2] }}</td>
+                    <td>{{ bill[3] }}</td>
+                    <td>{{ bill[4] }}</td>
+                    <td class="actions">
+                        <a href="/edit_billing/{{ bill[0] }}" class="text-warning"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="/delete_billing/{{ bill[0] }}" class="text-danger"><i class="fas fa-trash"></i> Delete</a>
+                        <a href="#" onclick="printBill('{{ bill[0] }}', '{{ bill[1] }}', '{{ bill[2] }}', '{{ bill[3] }}', '{{ bill[4] }}')" class="text-success">
+                            <i class="fas fa-print"></i> Print
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function printBill(billingId, appointmentId, amount, status, date) {
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            
+            // Content for the new window
+            const content = `
+                <html>
+                <head>
+                    <title>Print Bill #${billingId}</title>
+                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+                    <style>
+                        body { font-family: 'Poppins', sans-serif; padding: 20px; }
+                        h1 { text-align: center; color: #007bff; }
+                        .bill-details { margin-top: 30px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Billing Receipt</h1>
+                    <div class="bill-details">
+                        <p><strong>Billing ID:</strong> ${billingId}</p>
+                        <p><strong>Appointment ID:</strong> ${appointmentId}</p>
+                        <p><strong>Amount:</strong> ₹${amount}</p>
+                        <p><strong>Payment Status:</strong> ${status}</p>
+                        <p><strong>Billing Date:</strong> ${date}</p>
+                    </div>
+                    <button onclick="window.print()" class="btn btn-primary btn-block">Print</button>
+                </body>
+                </html>
+            `;
+
+            // Write the content to the new window
+            printWindow.document.open();
+            printWindow.document.write(content);
+            printWindow.document.close();
+
+            // Focus the new window
+            printWindow.focus();
+        }
+    </script>
+</body>
+
+</html>

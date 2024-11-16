@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patients</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+          body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f8ff;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .home-link {
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .home-link:hover {
+            text-decoration: underline;
+        }
+
+        .patient-form {
+            display: none; /* Hide the form by default */
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .add-patient-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            width: fit-content;
+        }
+
+        /* button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        } */
+
+        table {
+            margin: 20px auto;
+            width: 80%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        td a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="home-link"><i class="fas fa-home"></i> Home</a>
+        <h1>Patients Management</h1>
+
+        <!-- Button to toggle the Add Patient form -->
+        <!-- <button id="managePatientsButton" class="btn btn-primary">Manage Patients</button> -->
+        <a href="#" class="add-patient-btn" id="managePatientsButton"><i class="fas fa-user-md"></i> Add Patient</a>
+
+        <!-- Add Patient Form -->
+        <form id="patientForm" action="/add_patient" method="POST" class="patient-form">
+            <input type="text" id="name" name="name" placeholder="Name" required minlength="2">
+            <span id="nameError" class="error">Name must be at least 2 characters long</span>
+
+            <input type="number" id="age" name="age" placeholder="Age" required min="1" max="120">
+            <span id="ageError" class="error">Age must be between 1 and 120</span>
+
+            <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <span id="genderError" class="error">Please select a gender</span>
+
+            <input type="text" id="contact" name="contact" placeholder="Contact" required pattern="[0-9]{10}">
+            <span id="contactError" class="error">Contact must be a 10-digit number</span>
+
+            <textarea id="address" name="address" placeholder="Address" required minlength="10"></textarea>
+            <span id="addressError" class="error">Address must be at least 10 characters long</span>
+
+            <button type="submit">Add Patient</button>
+        </form>
+
+        <!-- Patients Table -->
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>{{ patient[0] }}</td>
+                    <td>{{ patient[1] }}</td>
+                    <td>{{ patient[2] }}</td>
+                    <td>{{ patient[3] }}</td>
+                    <td>{{ patient[4] }}</td>
+                    <td>{{ patient[5] }}</td>
+                    <td>
+                        <a href="/edit_patient/{{ patient[0] }}" class="text-warning"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="/delete_patient/{{ patient[0] }}" class="text-danger"><i class="fas fa-trash"></i> Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Toggle form visibility
+        document.getElementById('managePatientsButton').addEventListener('click', function() {
+            var form = document.getElementById('patientForm');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block'; // Show the form
+            } else {
+                form.style.display = 'none'; // Hide the form
+            }
+        });
+
+        // Custom validation on form submission
+        document.getElementById('patientForm').addEventListener('submit', function(event) {
+            var isValid = true;
+
+            // Name validation
+            var name = document.getElementById('name').value;
+            if (name.length < 2) {
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('nameError').style.display = 'none';
+            }
+
+            // Age validation
+            var age = document.getElementById('age').value;
+            if (age < 1 || age > 120) {
+                document.getElementById('ageError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('ageError').style.display = 'none';
+            }
+
+            // Gender validation
+            var gender = document.getElementById('gender').value;
+            if (!gender) {
+                document.getElementById('genderError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('genderError').style.display = 'none';
+            }
+
+            // Contact validation
+            var contact = document.getElementById('contact').value;
+            var contactPattern = /^[0-9]{10}$/;
+            if (!contactPattern.test(contact)) {
+                document.getElementById('contactError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('contactError').style.display = 'none';
+            }
+
+            // Address validation
+            var address = document.getElementById('address').value;
+            if (address.length < 10) {
+                document.getElementById('addressError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('addressError').style.display = 'none';
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+    </script>
+</body>
+
+</html>

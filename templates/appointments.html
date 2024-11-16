@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f8ff;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .home-link {
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .home-link:hover {
+            text-decoration: underline;
+        }
+
+        .add-appointment-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            width: fit-content;
+        }
+
+        .add-appointment-btn:hover {
+            background-color: #218838;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .actions a {
+            margin-right: 10px;
+            color: #007bff;
+        }
+
+        .actions a:hover {
+            text-decoration: underline;
+        }
+
+        form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="home-link"><i class="fas fa-home"></i> Home</a>
+        <h1>Appointments Management</h1>
+
+        <!-- Button to toggle the Schedule Appointment form -->
+        <a href="#" class="add-appointment-btn" id="scheduleAppointmentButton">
+            <i class="fas fa-calendar-plus"></i> Schedule Appointment
+        </a>
+
+        <!-- Schedule Appointment Form -->
+        <form id="appointmentForm" action="/schedule_appointment" method="POST" style="display: none;">
+            <select id="patient_id" name="patient_id" required>
+                <option value="" disabled selected>Select Patient</option>
+                {% for patient in patients %}
+                <option value="{{ patient[0] }}">{{ patient[1] }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="doctor_id" name="doctor_id" required>
+                <option value="" disabled selected>Select Doctor</option>
+                {% for doctor in doctors %}
+                <option value="{{ doctor[0] }}">{{ doctor[1] }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- <input type="datetime-local" id="appointment_date" name="appointment_date" required> -->
+            <label for="appointment_date">Appointment Date:</label>
+            <input type="date" name="appointment_date" required>
+            
+            <label for="appointment_time">Appointment Time:</label>
+            <input type="time" name="appointment_time" required>
+            <textarea id="reason" name="reason" placeholder="Reason" required></textarea>
+            <button type="submit">Schedule Appointment</button>
+        </form>
+
+        <!-- Appointments Table -->
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Patient Name</th>
+                    <th>Doctor Name</th>
+                    <th>Appointment Date</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    <td>{{ appointment[0] }}</td>
+                    <td>{{ appointment[1] }}</td>
+                    <td>{{ appointment[2] }}</td>
+                    <td>{{ appointment[3] }}</td>
+                    <td>{{ appointment[4] }}</td>
+                    <td class="actions">
+                        <a href="/edit_appointment/{{ appointment[0] }}" class="text-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="/delete_appointment/{{ appointment[0] }}" class="text-danger">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Toggle form visibility
+        document.getElementById('scheduleAppointmentButton').addEventListener('click', function() {
+            var form = document.getElementById('appointmentForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Set the minimum date for the appointment input to today
+        document.addEventListener('DOMContentLoaded', function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointment_date').setAttribute('min', today);
+        });
+    </script>
+</body>
+
+</html>
